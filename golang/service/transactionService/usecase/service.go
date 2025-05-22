@@ -12,6 +12,7 @@ import (
 
 	"google.golang.org/grpc/metadata"
 )
+
 type contextKey string
 
 const userIDContextKey = contextKey("user_id")
@@ -35,19 +36,30 @@ func NewOrderService(
 }
 
 func (s *TransactionService) GetReceiverInfo(ctx context.Context, accountNumber string, token string) (*wallet.GetUserByAccountNumberResponse, error) {
+	var headerMD metadata.MD
+
 	md := metadata.New(map[string]string{"authorization": token})
 	log.Println("GetReceiverInfo token:", token)
 	log.Println("GetReceiverInfo md:", md)
 
-    ctxWithMeta := metadata.NewOutgoingContext(ctx, md)
+	ctxWithMeta := metadata.NewOutgoingContext(ctx, md)
 
 	res, err := s.authClient.VerifyJWT(ctxWithMeta)
+
 	if err != nil || !res.IsValid {
 		log.Println("GetReceiverInfo VerifyJWT error:", err)
 		return nil, errors.New("unauthorized")
 	}
 
-	resp, err := s.walletClient.GetUserByAccountNumber(ctxWithMeta, accountNumber)
+	userIDs := headerMD.Get("user_id")
+	
+	log.Println("GetReceiverInfo userIDs:", userIDs)
+	userID := userIDs[0]
+
+	// Tạo context mới có chứa userID
+	userIDCtx := context.WithValue(ctxWithMeta, userIDContextKey, userID)
+
+	resp, err := s.walletClient.GetUserByAccountNumber(userIDCtx, accountNumber)
 	if err != nil {
 		return nil, errors.New("cannot find user: " + err.Error())
 	}
@@ -56,8 +68,8 @@ func (s *TransactionService) GetReceiverInfo(ctx context.Context, accountNumber 
 
 func (s *TransactionService) TransferMoney(ctx context.Context, transferPayload *payload.TransferPayload) (map[string]interface{}, error) {
 	md := metadata.New(map[string]string{"authorization": "Bearer " + transferPayload.Token})
-    ctxWithMeta := metadata.NewOutgoingContext(ctx, md)
-	
+	ctxWithMeta := metadata.NewOutgoingContext(ctx, md)
+
 	res, err := s.authClient.VerifyJWT(ctxWithMeta)
 	if err != nil || !res.IsValid {
 		return nil, errors.New("unauthorized")

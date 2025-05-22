@@ -2,8 +2,8 @@ package grpcclient
 
 import (
 	"context"
-	"source-base-go/golang/service/transactionService/model"
 	"source-base-go/golang/proto/wallet"
+	"source-base-go/golang/service/transactionService/model"
 )
 
 type WalletClient interface {

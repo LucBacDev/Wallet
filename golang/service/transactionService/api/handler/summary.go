@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 func GetReceiverInfo(ctx *gin.Context, transactionService usecase.UseCase) {
-	accountNumber := ctx.Param("accountNumber")
+	accountNumber := ctx.Param("account_number")
 	token := ctx.GetHeader("Authorization")
 	ctxWithTimeout, cancel := context.WithTimeout(ctx.Request.Context(), 2*time.Second)
 	defer cancel()

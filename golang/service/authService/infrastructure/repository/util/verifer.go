@@ -7,7 +7,7 @@ import (
 )
 
 type Verifier interface {
-	Verifier(userId int, token string) (bool, error)
+	Verifier(userId string, token string) (bool, error)
 }
 
 type AccessTokenRepository struct {
@@ -20,7 +20,7 @@ func NewAccessTokenRepository(db *gorm.DB) *AccessTokenRepository {
 	}
 }
 
-func (r *AccessTokenRepository) Verifier(userId int, token string) (bool, error) {
+func (r *AccessTokenRepository) Verifier(userId string, token string) (bool, error) {
 	var accessToken entity.AccessToken
 	err := r.db.Where("user_id = ? AND token = ? AND expires_at < NOW()", userId, token).First(&accessToken).Error
 	if err != nil {

@@ -60,11 +60,10 @@ func AuthUnaryInterceptor(verifier util.Verifier) grpc.UnaryServerInterceptor {
 			return nil, status.Errorf(codes.Unauthenticated, "invalid claims")
 		}
 
-		userIdFloat, ok := claims["user_id"].(float64)
+		userId, ok := claims["user_id"].(string)
 		if !ok {
 			return nil, status.Errorf(codes.Unauthenticated, "user_id claim missing or invalid")
 		}
-		userId := int(userIdFloat)
 
 		tokenExists, err := verifier.Verifier(userId, tokenString)
 		if err != nil {
@@ -73,6 +72,9 @@ func AuthUnaryInterceptor(verifier util.Verifier) grpc.UnaryServerInterceptor {
 		if tokenExists {
 			return nil, status.Error(codes.Unauthenticated, "invalid or revoked token")
 		}
+
+		header := metadata.Pairs("user_id", userId)
+		grpc.SendHeader(ctx, header)
 
 		newCtx := context.WithValue(ctx, userIDContextKey, userId)
 
