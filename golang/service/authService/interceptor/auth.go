@@ -6,6 +6,7 @@ import (
 	"log"
 	"source-base-go/golang/service/authService/config"
 	"source-base-go/golang/service/authService/infrastructure/repository/util"
+	"strconv"
 	"strings"
 
 	"google.golang.org/grpc"
@@ -60,7 +61,9 @@ func AuthUnaryInterceptor(verifier util.Verifier) grpc.UnaryServerInterceptor {
 			return nil, status.Errorf(codes.Unauthenticated, "invalid claims")
 		}
 
-		userId, ok := claims["user_id"].(string)
+		getUserId, ok := claims["user_id"].(float64)
+		userId := int32(getUserId)
+		userIdstring := strconv.Itoa(int(userId))
 		if !ok {
 			return nil, status.Errorf(codes.Unauthenticated, "user_id claim missing or invalid")
 		}
@@ -73,7 +76,7 @@ func AuthUnaryInterceptor(verifier util.Verifier) grpc.UnaryServerInterceptor {
 			return nil, status.Error(codes.Unauthenticated, "invalid or revoked token")
 		}
 
-		header := metadata.Pairs("user_id", userId)
+		header := metadata.Pairs("user_id", userIdstring)
 		grpc.SendHeader(ctx, header)
 
 		newCtx := context.WithValue(ctx, userIDContextKey, userId)
@@ -82,7 +85,7 @@ func AuthUnaryInterceptor(verifier util.Verifier) grpc.UnaryServerInterceptor {
 	}
 }
 
-func UserIDFromContext(ctx context.Context) (int, bool) {
-	userId, ok := ctx.Value(userIDContextKey).(int)
+func UserIDFromContext(ctx context.Context) (int32, bool) {
+	userId, ok := ctx.Value(userIDContextKey).(int32)
 	return userId, ok
 }

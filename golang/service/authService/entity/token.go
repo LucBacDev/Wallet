@@ -6,7 +6,7 @@ import (
 
 type AccessToken struct {
 	ID         int    `gorm:"primaryKey"`
-	UserId     int    `json:"user_id" gorm:"column:user_id"`
+	UserId     int32    `json:"user_id" gorm:"column:user_id"`
 	Jti        string `json:"jti" gorm:"column:jti"`
 	Token      string `gorm:"type:text;not null;column:token"`
 	IssuedAt   time.Time `gorm:"column:issued_at"`
@@ -15,7 +15,7 @@ type AccessToken struct {
 
 type RefreshToken struct {
 	ID         int    `gorm:"primaryKey"`
-	UserId     int    `json:"user_id" gorm:"column:user_id"`
+	UserId     int32    `json:"user_id" gorm:"column:user_id"`
 	Jti        string `json:"jti" gorm:"column:jti"`
 	Token      string `gorm:"type:text;not null;column:token"`
 	IssuedAt   time.Time `gorm:"column:issued_at"`

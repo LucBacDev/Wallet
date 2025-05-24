@@ -5,7 +5,7 @@ type User struct {
 	Name string 
 }
 type UserResponse struct {
-	UserID	string
+	UserID	int32
 	Status   string  
 	Name string 
 	AccountNumber string 

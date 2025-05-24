@@ -3,7 +3,7 @@ package presenter
 type AuthResult struct {
 	AccessToken  string `json:"accessToken"`
 	RefreshToken string `json:"refreshToken"`
-	UserId       int    `json:"userId"`
+	UserId       int32    `json:"userId"`
 	Username     string `json:"username"`
 }
 

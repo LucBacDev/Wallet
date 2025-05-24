@@ -1,6 +1,6 @@
 package entity
 type Result struct {
-	UserID        string
+	UserID        int32
 	Name          string
 	AccountNumber string
 }

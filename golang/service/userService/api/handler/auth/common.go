@@ -15,7 +15,7 @@ func convertRegisterPayloadToEntity(data *authPayload.Register) *entity.User {
 	}
 }
 
-func convertTokenPayloadToEntity(tokenPair *entity.TokenPair, userId int) (*entity.AccessToken, *entity.RefreshToken) {
+func convertTokenPayloadToEntity(tokenPair *entity.TokenPair, userId int32) (*entity.AccessToken, *entity.RefreshToken) {
 	accessTokenEntity := &entity.AccessToken{
 		UserId:    userId,
 		Token:     tokenPair.Token,

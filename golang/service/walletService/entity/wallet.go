@@ -4,7 +4,7 @@ import "time"
 
 type Wallet struct {
 	ID            int `gorm:"primaryKey"`
-	UserID        string
+	UserID        int32
 	AccountNumber string
 	Balance       int32
 	CreatedAt     time.Time
@@ -12,6 +12,6 @@ type Wallet struct {
 }
 
 type WalletInput struct {
-	UserID string
+	UserID int32
 	Amount int32
 }

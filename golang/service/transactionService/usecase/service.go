@@ -10,6 +10,7 @@ import (
 	"source-base-go/golang/service/transactionService/grpcclient"
 	"source-base-go/golang/service/transactionService/model"
 
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -36,30 +37,27 @@ func NewOrderService(
 }
 
 func (s *TransactionService) GetReceiverInfo(ctx context.Context, accountNumber string, token string) (*wallet.GetUserByAccountNumberResponse, error) {
-	var headerMD metadata.MD
 
 	md := metadata.New(map[string]string{"authorization": token})
 	log.Println("GetReceiverInfo token:", token)
 	log.Println("GetReceiverInfo md:", md)
 
 	ctxWithMeta := metadata.NewOutgoingContext(ctx, md)
+	var header metadata.MD
 
-	res, err := s.authClient.VerifyJWT(ctxWithMeta)
+	res, err := s.authClient.VerifyJWT(ctxWithMeta, grpc.Header(&header))
 
 	if err != nil || !res.IsValid {
-		log.Println("GetReceiverInfo VerifyJWT error:", err)
 		return nil, errors.New("unauthorized")
 	}
+	userIDs := header.Get("user_id")
 
-	userIDs := headerMD.Get("user_id")
-	
-	log.Println("GetReceiverInfo userIDs:", userIDs)
 	userID := userIDs[0]
 
-	// Tạo context mới có chứa userID
-	userIDCtx := context.WithValue(ctxWithMeta, userIDContextKey, userID)
+	mdWithUserID := metadata.Pairs("user_id", userID)
+	ctxWithUserID := metadata.NewOutgoingContext(ctx, mdWithUserID)
 
-	resp, err := s.walletClient.GetUserByAccountNumber(userIDCtx, accountNumber)
+	resp, err := s.walletClient.GetUserByAccountNumber(ctxWithUserID, accountNumber)
 	if err != nil {
 		return nil, errors.New("cannot find user: " + err.Error())
 	}

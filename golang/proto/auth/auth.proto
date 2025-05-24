@@ -9,6 +9,5 @@ service AuthService {
 message TokenRequest {}
 
 message TokenResponse {
-  string user_id = 1;
   bool is_valid = 2;
 }

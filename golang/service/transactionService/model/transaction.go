@@ -4,8 +4,8 @@ import "time"
 
 type Transaction struct {
 	ID         string `gorm:"primaryKey" json:"id"`
-	SenderID   string
-	ReceiverID string
+	SenderID   int32
+	ReceiverID int32
 	Amount     int32
 	Type       string
 	Status     string

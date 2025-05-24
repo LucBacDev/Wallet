@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"source-base-go/golang/proto/wallet"
 	"source-base-go/golang/service/walletService/grpc/handler"
 
@@ -26,11 +27,13 @@ func NewService(walletRepo walletRepository, grpc *grpc.Server) *Service {
 }
 
 func (s *Service) GetUserByAccountNumber(ctx context.Context, req *wallet.GetUserByAccountNumberRequest) (*wallet.GetUserByAccountNumberResponse, error) {
-	userID, ok := ctx.Value("user_id").(string)
-	if !ok || userID == "" {
+	userIDValue := ctx.Value(usecase.UserIDContextKey)  
+
+	userID, ok := userIDValue.(int32)
+		if !ok || userID == "" {
 		return nil, status.Error(codes.Internal, "user ID missing from context")
 	}
-
+	fmt.Println("GetUserByAccountNumber called with userID:", userID)
 	ucResp, err := s.walletRepo.GetUserByAccountNumber(ctx, req.AccountNumber)
 	if err != nil {
 		return nil, err

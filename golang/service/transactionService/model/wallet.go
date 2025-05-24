@@ -1,12 +1,12 @@
 package model
 
 type DebitInfo struct {
-	UserID string
+	UserID int32
 	Amount int32
 }
 
 type CreditInfo struct {
-	UserID string
+	UserID int32
 	Amount int32
 }
 type WalletResult struct {
